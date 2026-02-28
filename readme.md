@@ -66,6 +66,42 @@ nix-build ./test/minimal-test.nix
 $(nix-build -A driverInteractive ./test/minimal-test.nix)/bin/nixos-test-driver
 ```
 
+## Remote SSH Deploy NixOS
+
+### nix shell remote
+
+```bash
+nix-shell -p npins
+```
+
+### run shell.nix
+
+```bash
+nix-shell
+```
+
+### Test disk layout
+
+```bash
+nix-build -E "((import <nixpkgs> {}).nixos [ ./configuration.nix ]).installTest"
+```
+
+### Deploy
+
+```bash
+toplevel=$(nixos-rebuild build --no-flake)
+diskoScript=$(nix-build -E "((import <nixpkgs> {}).nixos [ ./configuration.nix ]).diskoScript")
+nixos-anywhere --store-paths "$diskoScript" "$toplevel" root@target-host
+```
+
+### Update
+
+```bash
+npins update nixpkgs
+nixos-rebuild switch --no-flake --target-host root@target-host
+```
+
+
 # Reference
 
 https://nix.dev/tutorials/nixos/nixos-configuration-on-vm#nixos-vms
